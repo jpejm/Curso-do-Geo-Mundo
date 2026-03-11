@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoMundo — Projeto Final Aula 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --border: #1e293b;
+    --green: #00e676;
+    --blue: #3b82f6;
+    --yellow: #facc15;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '🌍';
+    position: absolute;
+    font-size: 220px;
+    right: -20px;
+    top: -40px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--green);
+    color: #0a0e1a;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  header h1 span { color: var(--green); }
+  header p {
+    color: var(--muted);
+    margin-top: 12px;
+    font-size: 15px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: #0d1220;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 16px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .2s;
+    text-transform: uppercase;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION HEADER ── */
+  .sec-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .sec-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    min-width: 60px;
+  }
+  .sec-title { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+  .sec-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: 'Space Mono', monospace; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .card p { color: #94a3b8; line-height: 1.7; font-size: 15px; }
+
+  .highlight {
+    border-left: 3px solid var(--green);
+    padding-left: 20px;
+    margin: 16px 0;
+  }
+  .highlight p { color: var(--text); font-size: 16px; font-weight: 600; }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media(max-width:640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ── BENEFIT CARD ── */
+  .benefit {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .benefit-icon { font-size: 28px; margin-bottom: 12px; }
+  .benefit h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .benefit p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  /* ── LIST ── */
+  .check-list { list-style: none; }
+  .check-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    color: #94a3b8;
+    font-size: 15px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-list li::before { content: '→'; color: var(--green); font-family: 'Space Mono', monospace; font-weight: 700; flex-shrink: 0; }
+
+  /* ── RISK ── */
+  .risk { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; }
+  .risk-badge { font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .risk-badge.alto { background: #7f1d1d; color: #fca5a5; }
+  .risk-badge.medio { background: #78350f; color: #fcd34d; }
+  .risk-badge.baixo { background: #14532d; color: #86efac; }
+  .risk h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .risk p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: #060a14;
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #86efac;
+    position: relative;
+  }
+  .prompt-box::before {
+    content: 'PROMPT ESTRUTURADO';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: var(--bg);
+    color: var(--green);
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 0 8px;
+  }
+  .prompt-box .comment { color: var(--muted); }
+  .prompt-box .key { color: var(--yellow); }
+  .prompt-box .val { color: #93c5fd; }
+
+  /* ── MOCKUP ── */
+  .mockup {
+    background: linear-gradient(135deg, #0f172a, #1e3a5f);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .mockup::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,230,118,.12) 0%, transparent 70%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .globe-emoji { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 30px rgba(0,230,118,.4)); }
+  .mockup-name { font-size: 42px; font-weight: 800; letter-spacing: -2px; }
+  .mockup-name span { color: var(--green); }
+  .mockup-tagline { color: var(--muted); margin-top: 8px; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 2px; }
+  .mockup-pills { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; justify-content: center; }
+  .pill { background: rgba(0,230,118,.1); border: 1px solid rgba(0,230,118,.3); color: var(--green); font-size: 11px; padding: 4px 12px; border-radius: 100px; font-family: 'Space Mono', monospace; }
+
+  /* ── AI TABLE ── */
+  .ai-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .ai-table th { text-align: left; padding: 12px 16px; background: #0d1220; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .ai-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .ai-table tr:last-child td { border-bottom: none; }
+  .ai-table tr:hover td { background: rgba(255,255,255,.02); }
+  .ai-name { font-weight: 700; color: var(--green); font-family: 'Space Mono', monospace; font-size: 13px; }
+  .ai-step { color: var(--yellow); font-weight: 600; }
+  .ai-reason { color: var(--muted); font-size: 13px; }
+
+  /* ── MONO VERSION ── */
+  .version-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .version-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .version-text { font-size: 17px; font-weight: 600; line-height: 1.6; }
+  .best-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--green);
+    color: #0a0e1a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+  .justif { background: rgba(0,230,118,.06); border: 1px solid rgba(0,230,118,.2); border-radius: 8px; padding: 16px 20px; margin-top: 20px; }
+  .justif p { color: #86efac; font-size: 14px; line-height: 1.7; }
+
+  /* ── SIM CARD ── */
+  .sim-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .sim-q { font-size: 11px; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: 2px; color: var(--purple); text-transform: uppercase; margin-bottom: 10px; }
+  .sim-a { color: var(--text); font-size: 15px; line-height: 1.7; }
+
+  /* ── MONO MODEL ── */
+  .mono-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:640px) { .mono-grid { grid-template-columns: 1fr; } }
+  .mono-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .mono-icon { font-size: 28px; margin-bottom: 12px; }
+  .mono-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .mono-card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .price { font-size: 24px; font-weight: 800; color: var(--green); margin: 8px 0; }
+  .price span { font-size: 13px; font-weight: 400; color: var(--muted); }
+
+  /* ── OPORTUNIDADES DEEPSEEK ── */
+  .deep-card { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--blue); border-radius: 12px; padding: 22px 26px; margin-bottom: 16px; }
+  .deep-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #93c5fd; }
+  .deep-card p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .opp-num { font-size: 40px; font-weight: 800; color: var(--border); font-family: 'Space Mono', monospace; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Aula 6 — Projeto Final</div>
+  <h1>Geo<span>Mundo</span></h1>
+  <p>// Plataforma educacional interativa de geografia · 2026</p>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="show('s1',this)">01 · Definição</button>
+  <button class="nav-btn" onclick="show('s2',this)">02 · Proposta</button>
+  <button class="nav-btn" onclick="show('s3',this)">03 · Crítica</button>
+  <button class="nav-btn" onclick="show('s4',this)">04 · Protótipo</button>
+  <button class="nav-btn" onclick="show('s5',this)">05 · Identidade</button>
+  <button class="nav-btn" onclick="show('s6',this)">06 · Monetização</button>
+  <button class="nav-btn" onclick="show('s7',this)">🤖 DeepSeek</button>
+  <button class="nav-btn" onclick="show('s8',this)">💬 Le Chat</button>
+  <button class="nav-btn" onclick="show('s9',this)">🎮 Manus</button>
+  <button class="nav-btn" onclick="show('s10',this)">📋 IAs Usadas</button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 1 – DEFINIÇÃO ESTRATÉGICA            -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s1" class="section active">
+  <div class="sec-header">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">Definição Estratégica</div>
+      <div class="sec-subtitle">IA usada: Claude (Anthropic)</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+
+  <div class="card">
+    <div class="card-title">Nome do Projeto</div>
+    <h3 style="font-size:32px;letter-spacing:-1px;">🌍 GeoMundo</h3>
+    <p>Plataforma web interativa de aprendizado geográfico — gratuita, visual e gamificada.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Público-Alvo Específico</div>
+      <p>Estudantes do Ensino Fundamental II e Médio (11–18 anos) e professores de Geografia que buscam ferramentas digitais engajantes para complementar aulas tradicionais.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Dor Clara</div>
+      <p>Estudantes acham geografia chata porque ela é ensinada de forma passiva — mapas estáticos, decoreba de capitais e provas sem contexto. Não há uma plataforma gratuita em português que combine consulta enciclopédica, quiz gamificado e curiosidades de forma visualmente atraente num único lugar.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Transformação Prometida</div>
+    <div class="highlight">
+      <p>O estudante que antes decorava sem entender passa a <strong style="color:var(--green)">explorar o mundo com curiosidade</strong> — consultando países, treinando com quizzes de bandeiras e absorvendo recordes e curiosidades de forma autônoma, sem depender de um livro didático.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 2 – PROPOSTA ESTRUTURADA             -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s2" class="section">
+  <div class="sec-header">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">Proposta Estruturada</div>
+      <div class="sec-subtitle">IA usada: Claude (Anthropic)</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+
+  <div class="card">
+    <div class="card-title">Proposta de Valor — 1 Frase Forte</div>
+    <div class="highlight">
+      <p style="font-size:20px;">"O GeoMundo transforma a geografia de decoreba entediante em exploração interativa — 190+ países, quizzes e recordes mundiais num só lugar, de graça, em português."</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="card-title" style="margin-bottom:16px;">3 Benefícios Principais</div>
+  <div class="grid-3">
+    <div class="benefit">
+      <div class="benefit-icon">🗺️</div>
+      <h4>Consulta Completa</h4>
+      <p>190+ países com bandeira, capital, idioma, moeda e PIB — tudo filtrado por continente em segundos.</p>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">🎯</div>
+      <h4>Aprendizado Gamificado</h4>
+      <p>Quiz de bandeiras que torna o estudo competitivo, divertido e memorável sem precisar de professor.</p>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon">🏆</div>
+      <h4>Contexto e Curiosidade</h4>
+      <p>Recordes mundiais e 12 curiosidades geográficas que conectam dados frios à realidade do mundo.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="card">
+    <div class="card-title">Diferencial Competitivo</div>
+    <ul class="check-list">
+      <li>100% gratuito e em português — sem paywall, sem cadastro, sem app para baixar.</li>
+      <li>Único que combina enciclopédia + quiz + curiosidades numa mesma interface fluida.</li>
+      <li>Visual moderno e responsivo — diferente dos portais educacionais antiquados do MEC.</li>
+      <li>Filtro por continente com painel detalhado ao clicar — UX que portais concorrentes não têm.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 3 – REFINAMENTO CRÍTICO              -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s3" class="section">
+  <div class="sec-header">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">Refinamento Crítico</div>
+      <div class="sec-subtitle">IA usada: Claude (Anthropic)</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+
+  <div class="card-title" style="margin-bottom:16px;">Riscos Identificados</div>
+
+  <div class="risk">
+    <div class="risk-badge alto">ALTO</div>
+    <div>
+      <h4>Sem diferenciação sustentável</h4>
+      <p>Google, Wikipedia e portais do governo já oferecem dados de países gratuitamente. O GeoMundo precisa ser muito mais do que um banco de dados — precisa de experiência.</p>
+    </div>
+  </div>
+  <div class="risk">
+    <div class="risk-badge alto">ALTO</div>
+    <div>
+      <h4>Dados estáticos desatualizados</h4>
+      <p>PIB, capital e população mudam. Sem atualização automática ou manual periódica, o produto perde credibilidade rapidamente.</p>
+    </div>
+  </div>
+  <div class="risk">
+    <div class="risk-badge medio">MÉDIO</div>
+    <div>
+      <h4>Retenção zero</h4>
+      <p>Sem sistema de progresso, ranking ou perfil, o usuário não tem motivo para voltar ao site depois da primeira visita.</p>
+    </div>
+  </div>
+  <div class="risk">
+    <div class="risk-badge medio">MÉDIO</div>
+    <div>
+      <h4>Quiz com apenas bandeiras é limitado</h4>
+      <p>Um único tipo de quiz esgota o interesse do usuário em poucas sessões. Diversidade de desafios é essencial para engajamento contínuo.</p>
+    </div>
+  </div>
+  <div class="risk">
+    <div class="risk-badge baixo">BAIXO</div>
+    <div>
+      <h4>Sem versão offline / PWA</h4>
+      <p>Estudantes de regiões com internet instável não conseguem usar em escolas públicas sem conexão estável.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="card-title" style="margin-bottom:16px;">✅ Ajustes Feitos Após a Crítica</div>
+  <ul class="check-list">
+    <li><strong style="color:var(--text)">Sistema de pontuação e ranking</strong> — adicionar placar semanal no quiz para criar competição entre colegas e motivo de retorno.</li>
+    <li><strong style="color:var(--text)">Diversificar o quiz</strong> — incluir perguntas sobre capitais, moedas e idiomas além de bandeiras, aumentando o tempo de uso por sessão.</li>
+    <li><strong style="color:var(--text)">Integração com API de dados ao vivo</strong> — usar REST Countries API (gratuita) para manter PIB e população sempre atualizados automaticamente.</li>
+    <li><strong style="color:var(--text)">Modo professor</strong> — criar uma interface simples onde o professor monta um quiz personalizado e envia o link para a turma, gerando valor institucional.</li>
+    <li><strong style="color:var(--text)">PWA / modo offline</strong> — converter o site em Progressive Web App para funcionar sem internet e poder ser instalado no celular como app.</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 4 – PROTÓTIPO FUNCIONAL              -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s4" class="section">
+  <div class="sec-header">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">Protótipo Funcional</div>
+      <div class="sec-subtitle">IA usada: Claude (Anthropic)</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title">Fluxo de Uso do Produto</div>
+    <ul class="check-list">
+      <li><strong style="color:var(--text)">Entrada:</strong> Usuário acessa geomundo.app pelo celular ou computador, sem cadastro.</li>
+      <li><strong style="color:var(--text)">Exploração:</strong> Clica em um continente (ex: África) → vê painel com todos os países, filtra por nome ou capital.</li>
+      <li><strong style="color:var(--text)">Detalhes:</strong> Clica num país → abre card com bandeira, capital, idioma, moeda, PIB e curiosidade local.</li>
+      <li><strong style="color:var(--text)">Quiz:</strong> Inicia o desafio de bandeiras → responde 10 perguntas → recebe pontuação e posição no ranking semanal.</li>
+      <li><strong style="color:var(--text)">Retenção:</strong> É convidado a criar um apelido para aparecer no ranking → volta nos próximos dias para melhorar a pontuação.</li>
+    </ul>
+  </div>
+
+  <div class="prompt-box">
+    <span class="comment"># PROMPT ESTRUTURADO — MODO PROFESSOR (GeoMundo)</span><br><br>
+    <span class="key">PAPEL:</span> <span class="val">Você é o assistente pedagógico do GeoMundo.</span><br><br>
+    <span class="key">CONTEXTO:</span> <span class="val">Um professor de Geografia do Ensino Médio</span><br>
+    <span class="val">quer criar um quiz personalizado para sua turma.</span><br><br>
+    <span class="key">TAREFA:</span><br>
+    <span class="val">1. Pergunte: qual continente ou tema? (ex: América do Sul, capitais europeias)</span><br>
+    <span class="val">2. Pergunte: quantas questões? (5, 10 ou 15)</span><br>
+    <span class="val">3. Pergunte: nível de dificuldade? (fácil / médio / difícil)</span><br>
+    <span class="val">4. Gere o quiz com alternativas A/B/C/D e gabarito separado.</span><br>
+    <span class="val">5. Formate em JSON pronto para importar no GeoMundo.</span><br><br>
+    <span class="key">REGRAS:</span><br>
+    <span class="val">- Nunca repita o mesmo país em duas questões seguidas.</span><br>
+    <span class="val">- No nível difícil, use dados econômicos (PIB, IDH, moeda).</span><br>
+    <span class="val">- Inclua 1 curiosidade geográfica ao final de cada resposta correta.</span><br><br>
+    <span class="comment"># OUTPUT: JSON + versão texto para imprimir</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 5 – IDENTIDADE VISUAL                -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s5" class="section">
+  <div class="sec-header">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">Identidade Visual</div>
+      <div class="sec-subtitle">IA usada: Canva AI + Bing Image Creator</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+
+  <div class="mockup">
+    <div class="globe-emoji">🌍</div>
+    <div class="mockup-name">Geo<span>Mundo</span></div>
+    <div class="mockup-tagline">EXPLORE · APRENDA · DOMINE O MUNDO</div>
+    <div class="mockup-pills">
+      <span class="pill">190+ Países</span>
+      <span class="pill">Quiz Interativo</span>
+      <span class="pill">Grátis</span>
+      <span class="pill">Em Português</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <div class="card-title">Conceito Visual</div>
+    <ul class="check-list">
+      <li><strong style="color:var(--text)">Paleta:</strong> Azul profundo (#0a0e1a) como fundo — remete ao céu noturno e ao espaço, evocando a Terra vista de cima. Verde (#00e676) como acento — cor da vegetação, vida e descoberta.</li>
+      <li><strong style="color:var(--text)">Tipografia:</strong> Syne 800 para o nome — bold, moderno e com personalidade. Space Mono para dados técnicos — reforça precisão e caráter enciclopédico.</li>
+      <li><strong style="color:var(--text)">Glow no globo:</strong> Brilho esverdeado ao redor do emoji 🌍 — simboliza o planeta como fonte de conhecimento que irradia luz.</li>
+      <li><strong style="color:var(--text)">Tagline:</strong> "EXPLORE · APRENDA · DOMINE O MUNDO" — jornada em 3 etapas que resume o produto e cria desejo de progressão.</li>
+      <li><strong style="color:var(--text)">Ferramenta usada:</strong> Canva AI para refinamento do logotipo e composição dos cards; Bing Image Creator para geração de imagem conceito do globo estilizado.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 6 – MONETIZAÇÃO                     -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s6" class="section">
+  <div class="sec-header">
+    <div class="sec-num">06</div>
+    <div>
+      <div class="sec-title">Modelo de Monetização</div>
+      <div class="sec-subtitle">IA usada: Claude (Anthropic)</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+
+  <div class="mono-grid">
+    <div class="mono-card">
+      <div class="mono-icon">🆓</div>
+      <h4>Freemium — Gratuito</h4>
+      <div class="price">R$ 0<span>/sempre</span></div>
+      <p>Acesso completo ao enciclopédia, quiz básico de bandeiras e curiosidades. Sem cadastro necessário. Base de usuários para monetização indireta.</p>
+    </div>
+    <div class="mono-card" style="border-color: var(--green);">
+      <div class="mono-icon">⭐</div>
+      <h4>GeoMundo Pro — Escola</h4>
+      <div class="price">R$ 29<span>/mês por escola</span></div>
+      <p>Modo Professor com quiz personalizável, painel de desempenho da turma, ranking entre alunos e relatório de engajamento para o professor.</p>
+    </div>
+    <div class="mono-card">
+      <div class="mono-icon">📚</div>
+      <h4>Conteúdo Patrocinado</h4>
+      <div class="price">R$ 500–2k<span>/mês</span></div>
+      <p>Parceria com editoras educacionais (FTD, Moderna) para inserção de conteúdo temático dentro do quiz — sem afetar a experiência gratuita.</p>
+    </div>
+    <div class="mono-card">
+      <div class="mono-icon">🏫</div>
+      <h4>Licença Institucional</h4>
+      <div class="price">R$ 200<span>/ano por escola</span></div>
+      <p>Para secretarias de educação municipais — acesso a dashboard agregado com estatísticas de uso de toda a rede de escolas.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <div class="card-title">Estratégia de Crescimento</div>
+    <ul class="check-list">
+      <li>Fase 1 (0–6 meses): produto 100% gratuito para construir base de 10 mil usuários mensais.</li>
+      <li>Fase 2 (6–12 meses): lançar GeoMundo Pro para escolas com período de teste gratuito de 30 dias.</li>
+      <li>Fase 3 (12+ meses): parcerias com editoras e secretarias municipais de educação.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 7 – DEEPSEEK                        -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s7" class="section">
+  <div class="sec-header">
+    <div class="sec-num">🤖</div>
+    <div>
+      <div class="sec-title">Exploração com DeepSeek</div>
+      <div class="sec-subtitle">Raciocínio analítico para expandir a ideia</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title">Prompt Utilizado no DeepSeek</div>
+    <div class="prompt-box" style="margin-top:0;border-color:var(--blue);">
+      <span class="comment" style="color:#93c5fd;"># Analise a seguinte ideia de produto digital:</span><br><br>
+      <span class="val">O GeoMundo é uma plataforma web gratuita e interativa de geografia com 190+ países (bandeira, capital, idioma, moeda, PIB), filtro por continente, quiz de bandeiras e recordes mundiais. Público: estudantes 11-18 anos e professores.</span><br><br>
+      <span class="key">1.</span> <span class="val">Quais problemas adicionais esse público possui?</span><br>
+      <span class="key">2.</span> <span class="val">Quais oportunidades de expansão existem para esse produto?</span><br>
+      <span class="key">3.</span> <span class="val">Como tornar essa solução mais valiosa no mercado?</span>
+    </div>
+  </div>
+
+  <div class="card-title" style="margin-bottom:16px;">3 Novas Oportunidades Identificadas pelo DeepSeek</div>
+
+  <div class="deep-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div class="opp-num">01</div>
+      <h4>Ecossistema para Professores com alinhamento à BNCC</h4>
+    </div>
+    <p>O DeepSeek identificou que professores têm pouco tempo para criar materiais dinâmicos e precisam justificar atividades pela Base Nacional Comum Curricular. A oportunidade é mapear todo o conteúdo do GeoMundo para habilidades da BNCC (ex: EF07GE09) e oferecer um painel premium com criação de quizzes personalizados, relatórios de turma e integração com Google Classroom — transformando o produto em solução indispensável para escolas.</p>
+  </div>
+
+  <div class="deep-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div class="opp-num">02</div>
+      <h4>Expansão da Gamificação com Turmas e Rankings Privados</h4>
+    </div>
+    <p>O DeepSeek apontou que a gamificação atual é limitada. A oportunidade está em criar turmas virtuais onde o professor atribui quizzes como lição de casa, com data de entrega e placar interno da turma. Adicionar níveis ("Aprendiz", "Explorador", "Mestre da Geografia") e conquistas especiais aumentaria significativamente a retenção — transformando o GeoMundo de consulta ocasional em hábito de estudo diário.</p>
+  </div>
+
+  <div class="deep-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div class="opp-num">03</div>
+      <h4>Comparador de Países e Conteúdo com Contexto Real</h4>
+    </div>
+    <p>O DeepSeek identificou que estudantes sofrem com aprendizagem puramente decorativa — sabem a capital mas não entendem o contexto. A oportunidade é criar um comparador visual lado a lado entre países (PIB, população, idioma, bandeira) e enriquecer cada país com dados de fontes oficiais (FMI, Banco Mundial) com transparência sobre a origem — tornando o GeoMundo referência confiável, não apenas jogo.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 8 – LE CHAT                         -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s8" class="section">
+  <div class="sec-header">
+    <div class="sec-num">💬</div>
+    <div>
+      <div class="sec-title">Refinamento com Le Chat</div>
+      <div class="sec-subtitle">Mistral — clareza e impacto comercial</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <div class="card-title">Proposta Original (antes do Le Chat)</div>
+    <p style="font-style:italic;color:var(--muted);">"O GeoMundo é uma plataforma web interativa de aprendizado geográfico com 190+ países, quiz gamificado e curiosidades."</p>
+  </div>
+
+  <div class="version-card">
+    <div class="version-label" style="color:var(--blue);">Versão 1 — Simples</div>
+    <div class="version-text">"Aprenda geografia de forma fácil e divertida com o GeoMundo! Acesse 190+ países, teste seus conhecimentos com quizzes gamificados e descubra curiosidades incríveis — tudo grátis, em português e sem precisar de cadastro. Ideal para estudantes, professores e curiosos!"</div>
+  </div>
+
+  <div class="version-card" style="border-color:var(--purple);">
+    <div class="version-label" style="color:var(--purple);">Versão 2 — Emocional</div>
+    <div class="version-text">"Viaje pelo mundo sem sair de casa! Com o GeoMundo, você explora 190+ países, desafia amigos em quizzes divertidos e se encanta com histórias e curiosidades que vão além do mapa. Sem burocracia, sem custos — só aprendizado que inspira. Porque conhecer o mundo é a melhor aventura!"</div>
+  </div>
+
+  <div class="version-card" style="border-color:var(--green);position:relative;">
+    <div class="best-badge">✓ ESCOLHIDA</div>
+    <div class="version-label" style="color:var(--green);">Versão 3 — Estilo Startup</div>
+    <div class="version-text">"A revolução no aprendizado de geografia. O GeoMundo é a primeira plataforma 100% interativa que transforma dados geográficos em experiência gamificada, com 190+ países, quizzes desafiadores e curiosidades exclusivas. Zero fricção: sem cadastro, sem custo, em português. Para quem quer aprender rápido, fácil e com diversão."</div>
+  </div>
+
+  <div class="justif">
+    <div class="card-title" style="color:var(--green);margin-bottom:8px;">Por que a Versão 3?</div>
+    <p>A versão startup é a mais forte porque abre com uma declaração de impacto ("a revolução no aprendizado") que posiciona o produto como pioneiro. O termo "zero fricção" é linguagem de produto que ressoa com o público jovem e tech-savvy. Elimina as três principais objeções em sequência — sem cadastro, sem custo, em português — antes que o usuário pense nelas. É a versão que melhor converte em apresentações, redes sociais e landing pages.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 9 – MANUS                           -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s9" class="section">
+  <div class="sec-header">
+    <div class="sec-num">🎮</div>
+    <div>
+      <div class="sec-title">Simulação com Manus</div>
+      <div class="sec-subtitle">Experiência real de um usuário no produto</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title">Produto descrito para o Manus</div>
+    <p>O GeoMundo é uma plataforma web gratuita de geografia: 190+ países com bandeiras, capitais e dados, filtro por continente, quiz de bandeiras gamificado e recordes mundiais — tudo em português, sem cadastro.</p>
+  </div>
+
+  <div class="sim-card">
+    <div class="sim-q">Pergunta 1 — Como ele começaria a usar o produto?</div>
+    <div class="sim-a">Para começar a usar o GeoMundo, o usuário simplesmente precisaria acessar a plataforma web. Não é necessário nenhum tipo de cadastro ou login, o que torna o acesso imediato e sem burocracia. Ele pode começar a explorar os 190+ países, usar o filtro por continente, testar seus conhecimentos no quiz de bandeiras ou verificar os recordes mundiais de geografia.</div>
+  </div>
+
+  <div class="sim-card">
+    <div class="sim-q">Pergunta 2 — Qual seria o principal benefício percebido?</div>
+    <div class="sim-a">O principal benefício percebido seria a <strong style="color:var(--green)">facilidade e a gratuidade do acesso</strong> a um vasto conteúdo geográfico em português. A ausência de cadastro e o fato de ser gratuito eliminam barreiras de entrada, permitindo que qualquer pessoa com interesse em geografia comece a aprender e se divertir instantaneamente. A riqueza de informações sobre países e as funcionalidades interativas tornam o aprendizado envolvente e acessível.</div>
+  </div>
+
+  <div class="sim-card">
+    <div class="sim-q">Pergunta 3 — Por que ele continuaria usando?</div>
+    <div class="sim-a">O usuário continuaria usando por quatro razões principais: <strong style="color:var(--text)">aprendizado contínuo e divertido</strong> através do quiz e exploração de dados; <strong style="color:var(--text)">conveniência e acessibilidade</strong> por estar sempre disponível sem cadastro; <strong style="color:var(--text)">conteúdo abrangente em português</strong> que atende a uma necessidade específica da língua nativa; e <strong style="color:var(--text)">desafio e engajamento</strong> pelo quiz de bandeiras e recordes mundiais que incentivam o retorno para melhorar o desempenho.</div>
+  </div>
+
+  <hr class="divider">
+  <div class="card-title" style="margin-bottom:16px;">🔧 Ajustes na Ideia Após a Simulação do Manus</div>
+  <ul class="check-list">
+    <li><strong style="color:var(--text)">Reforçar "zero cadastro" como diferencial na página inicial</strong> — o Manus destacou que a ausência de login é o principal fator de entrada. Isso precisa estar visível imediatamente na tela inicial, não escondido.</li>
+    <li><strong style="color:var(--text)">Criar modo de consulta rápida por país</strong> — o Manus confirmou que usuários buscam acessar dados de um país específico rapidamente. Adicionar uma barra de busca direta na homepage reduz o atrito e acelera o primeiro benefício percebido.</li>
+    <li><strong style="color:var(--text)">Destacar o conteúdo em português como diferencial</strong> — o Manus apontou que conteúdo geográfico de qualidade na língua nativa é uma necessidade não atendida. Isso deve aparecer explicitamente no título ou subtítulo do site, não apenas como detalhe técnico.</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SEÇÃO 10 – TABELA DE IAs                  -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s10" class="section">
+  <div class="sec-header">
+    <div class="sec-num">📋</div>
+    <div>
+      <div class="sec-title">IAs Usadas no Projeto</div>
+      <div class="sec-subtitle">Cada etapa com uma ferramenta diferente</div>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="ai-table">
+      <thead>
+        <tr>
+          <th>IA</th>
+          <th>Etapa</th>
+          <th>Por que essa IA?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="ai-name">Claude</div><div style="font-size:11px;color:var(--muted);">Anthropic</div></td>
+          <td><div class="ai-step">Definição Estratégica<br>Proposta de Valor<br>Refinamento Crítico<br>Protótipo / Fluxo<br>Monetização</div></td>
+          <td><div class="ai-reason">Melhor para raciocínio estruturado, análise crítica e geração de texto longo e coerente. Ideal para construir a base estratégica do projeto com consistência entre as seções.</div></td>
+        </tr>
+        <tr>
+          <td><div class="ai-name">DeepSeek</div><div style="font-size:11px;color:var(--muted);">DeepSeek AI</div></td>
+          <td><div class="ai-step">Oportunidades de Expansão</div></td>
+          <td><div class="ai-reason">Forte em raciocínio analítico profundo e pensamento de longo prazo. Escolhido para a etapa de exploração estratégica por sua capacidade de encontrar conexões não óbvias entre mercados e problemas.</div></td>
+        </tr>
+        <tr>
+          <td><div class="ai-name">Le Chat</div><div style="font-size:11px;color:var(--muted);">Mistral AI</div></td>
+          <td><div class="ai-step">Refinamento de Comunicação<br>3 versões da proposta</div></td>
+          <td><div class="ai-reason">Excelente para copywriting comercial e reescrita de texto com diferentes registros emocionais. O modelo Mistral tem estilo de escrita mais fluido e comercial que outros modelos para esse tipo de tarefa.</div></td>
+        </tr>
+        <tr>
+          <td><div class="ai-name">Manus</div><div style="font-size:11px;color:var(--muted);">Monica AI</div></td>
+          <td><div class="ai-step">Simulação de Uso<br>Experiência do usuário</div></td>
+          <td><div class="ai-reason">Capacidade de simular agentes e cenários de uso de forma autônoma. Ideal para "testar" como um usuário real interagiria com o produto antes de ele existir de fato.</div></td>
+        </tr>
+        <tr>
+          <td><div class="ai-name">Canva AI</div><div style="font-size:11px;color:var(--muted);">Canva</div></td>
+          <td><div class="ai-step">Identidade Visual<br>Logo e composição</div></td>
+          <td><div class="ai-reason">Interface visual intuitiva para criação de peças gráficas com IA integrada. Mais prático para quem não é designer — gera composições prontas com tipografia e paleta ajustáveis.</div></td>
+        </tr>
+        <tr>
+          <td><div class="ai-name">Bing Image Creator</div><div style="font-size:11px;color:var(--muted);">Microsoft</div></td>
+          <td><div class="ai-step">Imagem conceito do globo</div></td>
+          <td><div class="ai-reason">Geração de imagens fotorrealistas e conceituais de alta qualidade via DALL-E 3. Usado para criar a imagem de identidade visual do produto de forma gratuita e rápida.</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:20px;border-color:var(--green);">
+    <div class="card-title">✅ Regra Cumprida</div>
+    <p>Nenhuma IA foi usada para a mesma função. Cada ferramenta foi escolhida por sua especialidade — raciocínio (Claude), análise profunda (DeepSeek), copywriting (Le Chat), simulação (Manus) e design (Canva AI + Bing). Total: <strong style="color:var(--green)">6 IAs diferentes, 6 funções distintas.</strong></p>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  GEOMUNDO · AULA 6 · PROJETO FINAL 2026 · FEITO COM 6 IAs DIFERENTES
+</footer>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
